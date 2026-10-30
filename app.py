@@ -7,7 +7,7 @@ import streamlit as st
 TITLE = "📚 MYMYMYMYMYMYMY"
 BASE = Path(__file__).parent
 
-st.set_page_config(page_title="Ôn tập Sinh", page_icon="📚", layout="centered")
+st.set_page_config(page_title="Moi Sý sinh", page_icon="📚", layout="centered")
 
 
 @st.cache_data
@@ -29,8 +29,25 @@ def md(text):
 
 
 def show_img(name):
-    if name:
-        st.image(str(BASE / "images" / name))
+    """Hiển thị ảnh dù ảnh nằm ở thư mục gốc hoặc trong thư mục images/."""
+    if not name:
+        return
+
+    # Hỗ trợ cả tên ảnh như "image1.png", "images/image1.png"
+    # và đường dẫn tương đối được lưu trong questions.json.
+    raw_path = Path(str(name))
+    candidates = [
+        BASE / raw_path,
+        BASE / "images" / raw_path.name,
+        BASE / raw_path.name,
+    ]
+
+    for image_path in candidates:
+        if image_path.is_file():
+            st.image(str(image_path), use_container_width=True)
+            return
+
+    st.warning(f"Không tìm thấy ảnh: {name}. Hãy kiểm tra tên ảnh trong questions.json và tên file trên GitHub.")
 
 
 def ans_text(flag):
